@@ -10,8 +10,12 @@ class SaveLoadManager:
         data_file = open(self.save_folder + "/" + name + self.file_extension,'wb')
         pickle.dump(data,data_file)
     def load_data(self,name):
-        data_file = open(self.save_folder + "/" + name + self.file_extension,'rb')
-        data = pickle.load(data_file)
-        return data
+        try:
+            data_file = open(self.save_folder + "/" + name + self.file_extension, 'rb')
+            data = pickle.load(data_file)
+            return data
+        except:
+            return None
+
     def check_for_file(self,name):
         return os.path.exists(self.save_folder + "/" + name + self.file_extension)

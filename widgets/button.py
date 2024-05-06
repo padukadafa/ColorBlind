@@ -7,7 +7,7 @@ from widgets.game_light import Light
 
 
 class Button(Widget):
-    def __init__(self,screen,text,x,y,w,h,font_size=12,onClick=None,show_light=True,is_mouse_pressed = False):
+    def __init__(self,screen,text,x,y,w,h,font_size=12,onClick=None,show_light=True,is_mouse_pressed = False,disabled = False):
         super().__init__()
         self.screen = screen
         self.onClick = onClick
@@ -19,19 +19,19 @@ class Button(Widget):
         self.text_rect = self.text.get_rect(center=self.rect.center)
         self.hover_sound = pygame.mixer.Sound('assets/audio/tick.mp3')
         self.hover_sound_played = False
+        self.disabled = disabled
 
 
     def render(self):
 
         if self.is_mouse_over():
-            print(self.hover_sound_played)
             # if not self.hover_sound_played:
             #     self.hover_sound.stop()
             #     self.hover_sound.play()
             #     # self.hover_sound_played = True
             pygame.draw.rect(self.screen, (255, 255, 255), self.rect, 2, 20)
 
-            if self.is_mouse_pressed:
+            if self.is_mouse_pressed and not self.disabled:
                 if self.onClick:
                     self.onClick()
             if self.show_light:

@@ -3,6 +3,7 @@ import math
 
 from core.app_colors import AppColors
 from widgets.block import Block
+from pygame.locals import *
 
 
 class ColorBlock(Block):
@@ -14,6 +15,8 @@ class ColorBlock(Block):
         self._height = height
         self._color = color
         self._rect = pygame.Rect(self._x, self._y, self._width, self._height)
+        self.image = pygame.image.load("assets/images/box.png")
+        self.image = pygame.transform.scale(self.image, (self._width,self._height))
         self._screen = screen
         self._draggable = draggable
         self._dx = 0
@@ -46,6 +49,7 @@ class ColorBlock(Block):
         if self._selected and self._draggable:
             pygame.draw.rect(self._screen,AppColors.white,self._rect.scale_by(1.1,1.1),4)
         pygame.draw.rect(self._screen, self._color,self._rect)
+        self._screen.blit(self.image,self._rect,special_flags=BLEND_RGB_MULT)
     def move(self,x,y):
         self._x = x
         self._y = y

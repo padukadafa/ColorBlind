@@ -14,11 +14,12 @@ from widgets.color_block import ColorBlock
 import math
 
 from widgets.empty_block import EmptyBlock
+from widgets.page import Page
 
-
-class GamePage(Widget):
-    def __init__(self,on_open_start_menu=None,on_restart=None):
-        self.screen = pygame.display.set_mode(AppConstant.screen_resolution)
+class GamePage(Page):
+    def __init__(self,screen,on_open_start_menu=None,on_restart=None):
+        super().__init__()
+        self.screen = screen
         pygame.display.set_caption(AppConstant.game_title)
         self.clock = pygame.time.Clock()
         self.selected_block = -1
@@ -205,10 +206,13 @@ class GamePage(Widget):
     def save_time(self):
         save_load_manager = SaveLoadManager(".save","save_data")
         low = save_load_manager.load_data("score_time")
+
+        if not low:
+            save_load_manager.save_data(self.get_time(), "score_time")
         time = self.get_time()
-        print(self.convert_time_to_int(low),self.convert_time_to_int(time))
-        if self.convert_time_to_int(low) > self.convert_time_to_int(time):
-            save_load_manager.save_data(time,"score_time")
+        if low:
+            if self.convert_time_to_int(low) > self.convert_time_to_int(time):
+                save_load_manager.save_data(time, "score_time")
     def convert_time_to_int(self,str):
         l_str = str.split(":")
         return int(l_str[0])*60 + int(l_str[1])
