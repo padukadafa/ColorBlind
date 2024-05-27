@@ -21,17 +21,43 @@ class GamePage(Page):
         super().__init__()
         self.screen = screen
         pygame.display.set_caption(AppConstant.game_title)
+        self.save_load_manager = SaveLoadManager(".save", "save_data")
+        self.difficulty = self.save_load_manager.load_data(AppConstant.DIFFICULTY)
+        self.row = 3
+        self.block_count = 12
+        self.block_gap = 90
+        self.block_start = 150
+        self.block_size = 100
+        self.block_height = 5
+        if self.difficulty is None or self.difficulty == "easy":
+            self.cols_count = [4,4,4]
+            self.block_height = 6
+        elif self.difficulty == "medium":
+            self.row = 4
+            self.block_count = 16
+            self.cols_count = [4,4,4,4]
+            self.block_gap = 70
+            self.block_start = 100
+        elif self.difficulty == "hard":
+            self.row = 5
+            self.block_count = 20
+            self.cols_count = [4,4,4,4,4]
+            self.block_gap = 60
+            self.block_start = 30
+
+        self.block_pos = [self.block_start+self.block_gap*i+i*self.block_size for i in range(self.row)]
         self.clock = pygame.time.Clock()
         self.selected_block = -1
         self.on_open_start_menu=on_open_start_menu
         self.selected_block_x = 0
         self.selected_block_y = 0
         self.blocks = self.generate_blocks()
+
         self.block = self.blocks[self.selected_block]
         self.background = pygame.image.load("assets/images/background.jpg")
         self.background= pygame.transform.scale(self.background,(AppConstant.screen_width,AppConstant.screen_height))
         self.light = Light(self.screen)
-        self.cols_count = [4,4,4]
+
         self.start_time = pygame.time.get_ticks()
         self.pause_start_time = pygame.time.get_ticks()
         self.pause_end_time = pygame.time.get_ticks()
@@ -64,7 +90,7 @@ class GamePage(Page):
                 if not self.is_pause:
                     self.selected_block = self.get_shorted_block(event.pos[0], event.pos[1])
                     self.cols_count = self.get_cols_count()
-                    if self.cols_count[0]*3-3 == self.selected_block or self.cols_count[1]*3-2 == self.selected_block or self.cols_count[2]*3-1 == self.selected_block:
+                    if self.row == 3 and (self.cols_count[0]*self.row-3 == self.selected_block or self.cols_count[1]*self.row-2 == self.selected_block or self.cols_count[2]*self.row-1 == self.selected_block):
 
                         self.block = self.blocks[self.selected_block]
                         self.blocks[self.selected_block] = EmptyBlock(self.screen,self.block.x,self.block.y,100,50)
@@ -76,10 +102,44 @@ class GamePage(Page):
                             self.block.enable_drag()
                         else:
                             self.selected_block=-1
+                    if self.row == 4 and (self.cols_count[0] * self.row - 4 == self.selected_block or self.cols_count[1] * self.row - 3 == self.selected_block or self.cols_count[2] * self.row - 2 == self.selected_block or self.cols_count[3] * self.row - 1 == self.selected_block):
+                        self.block = self.blocks[self.selected_block]
+                        self.blocks[self.selected_block] = EmptyBlock(self.screen, self.block.x, self.block.y, 100, 50)
+                        self.selected_block_x = self.blocks[self.selected_block].x
+                        self.selected_block_y = self.blocks[self.selected_block].y
+                        if type(self.block) is ColorBlock:
+                            self.pick_sound.stop()
+                            self.pick_sound.play()
+                            self.block.enable_drag()
+                        else:
+                            self.selected_block = -1
+                    if self.row == 5 and (self.cols_count[0] * self.row - 5 == self.selected_block or self.cols_count[1] * self.row - 4 == self.selected_block or self.cols_count[2] * self.row - 3 == self.selected_block or self.cols_count[3] * self.row - 2 == self.selected_block or self.cols_count[4] * self.row - 1 == self.selected_block):
+                        self.block = self.blocks[self.selected_block]
+                        self.blocks[self.selected_block] = EmptyBlock(self.screen, self.block.x, self.block.y, 100, 50)
+                        self.selected_block_x = self.blocks[self.selected_block].x
+                        self.selected_block_y = self.blocks[self.selected_block].y
+                        if type(self.block) is ColorBlock:
+                            self.pick_sound.stop()
+                            self.pick_sound.play()
+                            self.block.enable_drag()
+                        else:
+                            self.selected_block = -1
             if event.type == pygame.MOUSEBUTTONUP:
                 self.is_mouse_pressed = False
                 if not self.is_pause:
-                    if self.cols_count[0] * 3 - 3 == self.selected_block or self.cols_count[1] * 3 - 2 == self.selected_block or self.cols_count[2] * 3 - 1 == self.selected_block:
+                    if self.row == 3 and (self.cols_count[0] * self.row - 3 == self.selected_block or self.cols_count[1] * self.row - 2 == self.selected_block or self.cols_count[2] * self.row - 1 == self.selected_block):
+                        self.draw_pause()
+                        self.drop_sound.play()
+                        self.block.disable_drag()
+                        self.block_draggable_event()
+                        self.selected_block = -1
+                    if self.row == 4 and (self.cols_count[0] * self.row - 4 == self.selected_block or self.cols_count[1] * self.row - 3 == self.selected_block or self.cols_count[2] * self.row - 2 == self.selected_block or self.cols_count[3] * self.row - 1 == self.selected_block):
+                        self.draw_pause()
+                        self.drop_sound.play()
+                        self.block.disable_drag()
+                        self.block_draggable_event()
+                        self.selected_block = -1
+                    if self.row == 5 and (self.cols_count[0] * self.row - 5 == self.selected_block or self.cols_count[1] * self.row - 4 == self.selected_block or self.cols_count[2] * self.row - 3 == self.selected_block or self.cols_count[3] * self.row - 2 == self.selected_block or self.cols_count[4] * self.row - 1 == self.selected_block):
                         self.draw_pause()
                         self.drop_sound.play()
                         self.block.disable_drag()
@@ -114,16 +174,24 @@ class GamePage(Page):
         self.clock.tick(AppConstant.fps)
 
     def get_cols_count(self):
-        cols_count = [0,0,0]
-        for i in range(6):
-            if type(self.blocks[0 + i * 3]) is ColorBlock:
+        cols_count = [0 for i in range(self.row)]
+        for i in range(self.block_height):
+            if type(self.blocks[0 + i * self.row]) is ColorBlock:
                 cols_count[0] += 1
-        for i in range(6):
-            if type(self.blocks[1 + i * 3]) is ColorBlock:
+        for i in range(self.block_height):
+            if type(self.blocks[1 + i * self.row]) is ColorBlock:
                 cols_count[1] += 1
-        for i in range(6):
-            if type(self.blocks[2 + i * 3]) is ColorBlock:
+        for i in range(self.block_height):
+            if type(self.blocks[2 + i * self.row]) is ColorBlock:
                 cols_count[2] += 1
+        if self.row >= 4:
+            for i in range(self.block_height):
+                if type(self.blocks[3 + i * self.row]) is ColorBlock:
+                    cols_count[3] += 1
+        if self.row == 5:
+            for i in range(self.block_height):
+                if type(self.blocks[4 + i * self.row]) is ColorBlock:
+                    cols_count[4] += 1
         return cols_count
 
     def draw_block(self):
@@ -146,16 +214,16 @@ class GamePage(Page):
         min = math.inf
         index = 0
         result = 0
-        for i in range(0,3):
-            if math.sqrt((block.x - AppConstant.block_pos[i])**2) < min:
-                min = math.sqrt((block.x - AppConstant.block_pos[i])**2)
+        for i in range(0,self.row):
+            if math.sqrt((block.x - self.block_pos[i])**2) < min:
+                min = math.sqrt((block.x - self.block_pos[i])**2)
                 index = i
         cols_count =self.get_cols_count()
-        if cols_count[index] == 6:
+        if cols_count[index] == self.block_height:
             return self.selected_block
-        for i in range(6):
-            if type(self.blocks[index+i*3]) is EmptyBlock:
-                result = index+i*3
+        for i in range(self.block_height):
+            if type(self.blocks[index+i*self.row]) is EmptyBlock:
+                result = index+i*self.row
                 break
         return result
 
@@ -172,25 +240,34 @@ class GamePage(Page):
         self.screen.blit(self.background,(0,0))
     def generate_blocks(self):
         blocks = []
-        blocks_count = [0,0,0]
-        i = blocks_count[0] + blocks_count[1] + blocks_count[2]
-        while i < 12:
-            random_index = random.randint(0,2)
-            i = blocks_count[0] + blocks_count[1] + blocks_count[2]
+        blocks_count = [0 for x in range(self.row)]
 
+        i = 0
+        for j in blocks_count:
+            i += j
+        while i < self.block_count:
+            random_index = random.randint(0,self.row-1)
+            i = 0
+            print(blocks_count)
+            for j in blocks_count:
+                i += j
             if random_index ==0 and blocks_count[0] < 4:
-                blocks.append(ColorBlock(self.screen,AppConstant.block_pos[i%3],AppConstant.bloc_floor-50*math.floor(i/3),100,50,AppColors.blue))
+                blocks.append(ColorBlock(self.screen, self.block_pos[i%self.row],AppConstant.bloc_floor-50*math.floor(i/self.row),self.block_size,50,AppColors.blue))
                 blocks_count[0] += 1
             if random_index ==1 and blocks_count[1] < 4:
-                blocks.append(ColorBlock(self.screen,AppConstant.block_pos[i%3],AppConstant.bloc_floor-50*math.floor(i/3),100,50,AppColors.red))
-
+                blocks.append(ColorBlock(self.screen, self.block_pos[i%self.row],AppConstant.bloc_floor-50*math.floor(i/self.row),self.block_size,50,AppColors.red))
                 blocks_count[1] += 1
             if random_index ==2 and blocks_count[2] < 4:
-                blocks.append(ColorBlock(self.screen,AppConstant.block_pos[i%3],AppConstant.bloc_floor-50*math.floor(i/3),100,50,AppColors.cyan))
-
+                blocks.append(ColorBlock(self.screen, self.block_pos[i%self.row],AppConstant.bloc_floor-50*math.floor(i/self.row),self.block_size,50,AppColors.cyan))
                 blocks_count[2] += 1
-        for i in range(6):
-            blocks.append(EmptyBlock(self.screen,AppConstant.block_pos[i%3],AppConstant.bloc_floor-50*math.floor((i+12)/3),100,50))
+            if  self.row >= 4 and random_index ==3 and blocks_count[3] < 4:
+                blocks.append(ColorBlock(self.screen, self.block_pos[i%self.row],AppConstant.bloc_floor-50*math.floor(i/self.row),self.block_size,50,AppColors.magenta))
+                blocks_count[3] += 1
+            if self.row == 5 and random_index ==4 and blocks_count[4] < 4:
+                blocks.append(ColorBlock(self.screen, self.block_pos[i%self.row],AppConstant.bloc_floor-50*math.floor(i/self.row),self.block_size,50,AppColors.white))
+                blocks_count[4] += 1
+        for i in range(self.row*2):
+            blocks.append(EmptyBlock(self.screen,self.block_pos[i%self.row],AppConstant.bloc_floor-50*math.floor((i+self.block_count)/self.row),self.block_size,50))
         return blocks
 
     def draw_time(self):
@@ -204,15 +281,16 @@ class GamePage(Page):
         return f"{math.floor(self.time/60000)}:{math.floor(self.time/1000)%60}"
 
     def save_time(self):
-        save_load_manager = SaveLoadManager(".save","save_data")
-        low = save_load_manager.load_data("score_time")
+
+        difficulty = self.save_load_manager.load_data(AppConstant.DIFFICULTY)
+        low = self.save_load_manager.load_data(difficulty + "_score_time")
 
         if not low:
-            save_load_manager.save_data(self.get_time(), "score_time")
+            self.save_load_manager.save_data(self.get_time(), difficulty + "_score_time")
         time = self.get_time()
         if low:
             if self.convert_time_to_int(low) > self.convert_time_to_int(time):
-                save_load_manager.save_data(time, "score_time")
+                self.save_load_manager.save_data(time, difficulty + "_score_time")
     def convert_time_to_int(self,str):
         l_str = str.split(":")
         return int(l_str[0])*60 + int(l_str[1])
@@ -241,31 +319,49 @@ class GamePage(Page):
 
         win = True
 
-        color_map = [0,0,0] # red, cyan,blue
-        cols_count = [0,0,0]
-        for i in range(3):
+        color_map = [0 for i in range(self.row)] # red, cyan,blue
+        cols_count = [0 for i in range(self.row)]
+        for i in range(self.row):
             if self.blocks[i].get_color() == AppColors.red:
-                color_map[0] =i
+                color_map[0] = i
             if self.blocks[i].get_color() == AppColors.cyan:
-                color_map[1]=i
+                color_map[1] = i
             if self.blocks[i].get_color() == AppColors.blue:
-                color_map[2]=i
+                color_map[2] = i
+            if self.blocks[i].get_color() == AppColors.magenta:
+                color_map[3] = i
+            if self.blocks[i].get_color() == AppColors.white:
+                color_map[4] = i
 
         for i in range(4):
-            if self.blocks[color_map[0] + 3*i].get_color() != AppColors.red:
+            if self.blocks[color_map[0] + self.row*i].get_color() != AppColors.red:
                 win = False
                 break
             cols_count[color_map[0]] += 1
         for i in range(4):
-            if self.blocks[color_map[1] + 3 * i].get_color() != AppColors.cyan:
+            if self.blocks[color_map[1] + self.row * i].get_color() != AppColors.cyan:
                 win = False
                 break
             cols_count[color_map[1]] += 1
         for i in range(4):
-            if self.blocks[color_map[2] + 3 * i].get_color() != AppColors.blue:
+            if self.blocks[color_map[2] + self.row * i].get_color() != AppColors.blue:
                 win = False
                 break
             cols_count[color_map[2]] += 1
+        if self.row==4:
+            for i in range(4):
+                if self.blocks[color_map[3] + self.row * i].get_color() != AppColors.magenta:
+                    win = False
+                    break
+                cols_count[color_map[3]] += 1
+        if self.row==5:
+
+            for i in range(4):
+                if self.blocks[color_map[4] + self.row * i].get_color() != AppColors.white:
+                    win = False
+                    break
+                cols_count[color_map[4]] += 1
+        print(cols_count)
         if win:
             self.win = True
             self.is_pause = True

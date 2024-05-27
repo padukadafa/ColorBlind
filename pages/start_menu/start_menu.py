@@ -25,6 +25,10 @@ class StartMenu(Page):
         self.is_mouse_pressed = False
         self.is_show_about = False
         self.circles = self.generate_circle()
+        self.save_load_manager = SaveLoadManager(".save", "save_data")
+        self.difficulty = self.save_load_manager.load_data(AppConstant.DIFFICULTY)
+        if self.difficulty is None:
+            self.difficulty = "easy"
 
     def render(self):
         self.event_handler()
@@ -35,6 +39,7 @@ class StartMenu(Page):
             self.show_about()
         else:
             self.draw_menu()
+            self.draw_difficult()
         self.draw_score(self.screen.get_width() - 250)
         self.draw_block(600,400)
         pygame.display.update()
@@ -50,24 +55,44 @@ class StartMenu(Page):
             if event.type == pygame.MOUSEBUTTONUP:
                 self.is_mouse_pressed = False
     def draw_menu(self):
-        start_button = Button(self.screen,"Start",150,200,200,80,font_size=32,onClick=self.onStart,is_mouse_pressed=self.is_mouse_pressed,disabled=self.is_show_about)
-        setting_button = Button(self.screen, "Settings", 150, 290, 200, 80, font_size=32, is_mouse_pressed=self.is_mouse_pressed,onClick=self.onSetting)
-        about_button = Button(self.screen, "About", 150, 380, 200, 80, font_size=32, onClick=self.on_show_about,
+        start_button = Button(self.screen,"Start",150,200,200,70,font_size=32,onClick=self.onStart,is_mouse_pressed=self.is_mouse_pressed,disabled=self.is_show_about)
+        shop_button = Button(self.screen, "Shop", 150, 275, 200, 70, font_size=32, onClick=self.on_show_about,
+                             is_mouse_pressed=self.is_mouse_pressed)
+        setting_button = Button(self.screen, "Settings", 150, 350, 200, 70, font_size=32, is_mouse_pressed=self.is_mouse_pressed,onClick=self.onSetting)
+        about_button = Button(self.screen, "About", 150, 425, 200, 70, font_size=32, onClick=self.on_show_about,
                                 is_mouse_pressed=self.is_mouse_pressed)
 
+
         start_button.render()
+        shop_button.render()
         setting_button.render()
         about_button.render()
 
+    def draw_difficult(self):
+        if self.difficulty != "easy":
+            easy_button = Button(self.screen, "Easy", 350, 230, 150, 50, font_size=24, onClick=self.set_difficulty_easy,
+                                 is_mouse_pressed=self.is_mouse_pressed, disabled=self.is_show_about)
+        else:
+            easy_button = Button(self.screen,"Easy",350,230,150,50,font_size=24,onClick=self.set_difficulty_easy,is_mouse_pressed=self.is_mouse_pressed,disabled=self.is_show_about,background_color=(255,255,255),text_color=(20,20,20))
+        if self.difficulty != "medium":
+            medium_button = Button(self.screen,"Medium",350,290,150,50,font_size=24,onClick=self.set_difficulty_medium,is_mouse_pressed=self.is_mouse_pressed,disabled=self.is_show_about)
+        else:
+            medium_button = Button(self.screen,"Medium",350,290,150,50,font_size=24,onClick=self.set_difficulty_medium,is_mouse_pressed=self.is_mouse_pressed,disabled=self.is_show_about,background_color=(255,255,255),text_color=(20,20,20))
+        if self.difficulty != "hard":
+            hard_button = Button(self.screen,"Hard",350,350,150,50,font_size=24,onClick=self.set_difficulty_hard,is_mouse_pressed=self.is_mouse_pressed,disabled=self.is_show_about)
 
+        else:
+            hard_button = Button(self.screen,"Hard",350,350,150,50,font_size=24,onClick=self.set_difficulty_hard,is_mouse_pressed=self.is_mouse_pressed,disabled=self.is_show_about,background_color=(255,255,255),text_color=(20,20,20))
+
+        easy_button.render()
+        medium_button.render()
+        hard_button.render()
     def draw_score(self,x):
-        save_load_manager = SaveLoadManager(".save","save_data")
         score = "No score"
-        if save_load_manager.check_for_file("score_time"):
+        if self.save_load_manager.check_for_file(self.difficulty + "_score_time"):
+            score = self.save_load_manager.load_data(self.difficulty + "_score_time")
 
-            score = save_load_manager.load_data("score_time")
-
-        score_font= pygame.font.SysFont('Arial',100)
+        score_font= pygame.font.SysFont('Arial',80)
         score_dec_font = pygame.font.SysFont('Arial',30)
         score_text = score_font.render(f"{score}",True,(255,255,255))
         score_dec_text = score_dec_font.render("Best Time", True, (255, 255, 255))
@@ -116,6 +141,20 @@ class StartMenu(Page):
 
     def on_show_about(self):
         self.is_show_about = True
+    def set_difficulty(self,difficulty):
+        self.save_load_manager.save_data(difficulty,AppConstant.DIFFICULTY)
+    def set_difficulty_easy(self):
+        self.set_difficulty("easy")
+        self.difficulty = "easy"
+
+    def set_difficulty_medium(self):
+        self.set_difficulty("medium")
+        self.difficulty = "medium"
+
+    def set_difficulty_hard(self):
+        self.set_difficulty("hard")
+        self.difficulty = "hard"
+
     def on_deshow_about(self):
         self.is_mouse_pressed = False
         self.is_show_about = False
