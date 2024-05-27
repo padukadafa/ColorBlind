@@ -84,7 +84,7 @@ class StartMenu(Page):
     def generate_circle(self):
         circles = []
         for i in range(random.randint(15, 25)):
-            random_pos = (random.randint(0, AppConstant.screen_width-AppConstant.screen_width/4), random.randint(0, AppConstant.screen_height-AppConstant.screen_height/2))
+            random_pos = (random.randint(0, int(AppConstant.screen_width-AppConstant.screen_width/4)), random.randint(0, int(AppConstant.screen_height-AppConstant.screen_height/2)))
             random_radius = random.randint(8, 10) * 15
             circle = Circle(self.screen, random_pos[0], random_pos[1], random_radius)
             circles.append(circle)
