@@ -7,4 +7,5 @@ class AppConstant:
     bloc_floor = 500
     VOLUME_STATUS = 'volume_status'
     DIFFICULTY = 'difficulty'
+    skins= ["assets/images/box.png","assets/images/brick.jpg"]
 

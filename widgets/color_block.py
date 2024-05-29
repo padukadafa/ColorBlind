@@ -2,6 +2,7 @@ import pygame
 import math
 
 from core.app_colors import AppColors
+from core.app_constant import AppConstant
 from widgets.block import Block
 from pygame.locals import *
 
@@ -15,7 +16,7 @@ class ColorBlock(Block):
         self._height = height
         self._color = color
         self._rect = pygame.Rect(self._x, self._y, self._width, self._height)
-        self.image = pygame.image.load("assets/images/box.png")
+        self.image = pygame.image.load(AppConstant.skins[0])
         self.image = pygame.transform.scale(self.image, (self._width,self._height))
         self._screen = screen
         self._draggable = draggable

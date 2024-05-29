@@ -28,7 +28,7 @@ class GamePage(Page):
         self.block_gap = 90
         self.block_start = 150
         self.block_size = 100
-        self.block_height = 5
+        self.block_height = 6
         if self.difficulty is None or self.difficulty == "easy":
             self.cols_count = [4,4,4]
             self.block_height = 6
@@ -248,7 +248,6 @@ class GamePage(Page):
         while i < self.block_count:
             random_index = random.randint(0,self.row-1)
             i = 0
-            print(blocks_count)
             for j in blocks_count:
                 i += j
             if random_index ==0 and blocks_count[0] < 4:

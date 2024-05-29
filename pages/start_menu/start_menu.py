@@ -43,7 +43,6 @@ class StartMenu(Page):
         self.draw_score(self.screen.get_width() - 250)
         self.draw_block(600,400)
         pygame.display.update()
-
         self.clock.tick(AppConstant.fps)
     def event_handler(self):
         for event in pygame.event.get():
@@ -55,16 +54,11 @@ class StartMenu(Page):
             if event.type == pygame.MOUSEBUTTONUP:
                 self.is_mouse_pressed = False
     def draw_menu(self):
-        start_button = Button(self.screen,"Start",150,200,200,70,font_size=32,onClick=self.onStart,is_mouse_pressed=self.is_mouse_pressed,disabled=self.is_show_about)
-        shop_button = Button(self.screen, "Shop", 150, 275, 200, 70, font_size=32, onClick=self.on_show_about,
-                             is_mouse_pressed=self.is_mouse_pressed)
-        setting_button = Button(self.screen, "Settings", 150, 350, 200, 70, font_size=32, is_mouse_pressed=self.is_mouse_pressed,onClick=self.onSetting)
-        about_button = Button(self.screen, "About", 150, 425, 200, 70, font_size=32, onClick=self.on_show_about,
+        start_button = Button(self.screen,"Start",150,200,200,80,font_size=32,onClick=self.onStart,is_mouse_pressed=self.is_mouse_pressed,disabled=self.is_show_about)
+        setting_button = Button(self.screen, "Settings", 150, 290, 200, 80, font_size=32, is_mouse_pressed=self.is_mouse_pressed,onClick=self.onSetting)
+        about_button = Button(self.screen, "About", 150, 380, 200, 80, font_size=32, onClick=self.on_show_about,
                                 is_mouse_pressed=self.is_mouse_pressed)
-
-
         start_button.render()
-        shop_button.render()
         setting_button.render()
         about_button.render()
 
